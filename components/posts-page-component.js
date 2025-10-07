@@ -10,7 +10,47 @@ export function renderPostsPageComponent({ appEl }) {
    * @TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
    * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
    */
-  const appHtml = `
+
+  const container = document.getElementById('app')
+
+  const postHtml = posts.map((post, index) => {
+    const postDate = new Date(post.createdAt);
+
+      const timeAgo = formatDistanceToNow(postDate, {
+        addSuffix: true,
+        locale: ru
+      });
+
+    return `
+      <li class="post">
+        <div class="post-header" data-user-id=${post.id}>
+            <img src="${post.user.imageUrl}" class="post-header__user-image alt="фото профиля пользователя"
+            <p class="post-header__user-name">${post.user.name}</p>
+        </div>
+        <div class="post-image-container">
+          <img class="post-image" src="${post.imageUrl}" alt="фото поста">
+        </div>
+        <div class="post-likes">
+          <button data-post-id="642d00579b190443860c2f32" class="like-button">
+            <img src="./assets/images/like-active.svg">
+          </button>
+          <p class="post-likes-text">
+            Нравится: <strong>${post.likes[0].name || 'Никому'}
+              ${post.likes.length>1? `и ещё ${post.likes.length-1}` : ''}</strong>
+          </p>
+        </div>
+        <p class="post-text">
+          <span class="user-name">${post.user.name}</span>
+          ${post.description}
+        </p>
+        <p class="post-date">
+          ${timeAgo}
+        </p>
+      </li>
+    ` 
+  }).join('');
+  
+  /*const appHtml = `
               <div class="page-container">
                 <div class="header-container"></div>
                 <ul class="posts">
@@ -91,7 +131,7 @@ export function renderPostsPageComponent({ appEl }) {
                     </p>
                   </li>
                 </ul>
-              </div>`;
+              </div>`;*/
 
   appEl.innerHTML = appHtml;
 
