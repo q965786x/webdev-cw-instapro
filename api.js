@@ -23,6 +23,24 @@ export function getPosts({ token }) {
     });
 }
 
+export function addPost({ token, description, imageUrl }) {
+  return fetch(postsHost, {
+    method: "POST",
+    body: JSON.stringify({
+      description,
+      imageUrl,
+    }),
+    headers: {
+      Authorization: token,
+    },
+  }).then((response) => {
+    if (response.status === 401) {
+      throw new Error("Нет авторизации");
+    }
+    return response.json();
+  });
+}
+
 export function registerUser({ login, password, name, imageUrl }) {
   return fetch(baseHost + "/api/user", {
     method: "POST",

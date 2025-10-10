@@ -1,6 +1,8 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from "../index.js";
+import { formatDistanceToNow } from "https://esm.sh/date-fns";
+import { ru } from 'https://esm.sh/date-fns/locale';
 
 export function renderPostsPageComponent({ appEl }) {
   // @TODO: реализовать рендер постов из api
@@ -11,19 +13,19 @@ export function renderPostsPageComponent({ appEl }) {
    * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
    */
 
-  const container = document.getElementById('app')
+  const postsHtml = posts.map(post => {
+    const isLiked = post.isLiked;
+    const likeButtonImg = isLiked 
+      ? './assets/images/like-active.svg' 
+      : './assets/images/like-not-active.svg';
 
-  const postHtml = posts.map((post, index) => {
-    const postDate = new Date(post.createdAt);
-
-      const timeAgo = formatDistanceToNow(postDate, {
-        addSuffix: true,
-        locale: ru
-      });
+    const postDate = formatDistanceToNow(new Date(post.createdAt), 
+      {locale: ru}
+    )
 
     return `
-      <li class="post">
-        <div class="post-header" data-user-id=${post.id}>
+      <li class="post" data-post-id="${post.id}">
+        <div class="post-header" data-user-id=${post.user.id}>
             <img src="${post.user.imageUrl}" class="post-header__user-image alt="фото профиля пользователя"
             <p class="post-header__user-name">${post.user.name}</p>
         </div>
@@ -31,12 +33,11 @@ export function renderPostsPageComponent({ appEl }) {
           <img class="post-image" src="${post.imageUrl}" alt="фото поста">
         </div>
         <div class="post-likes">
-          <button data-post-id="642d00579b190443860c2f32" class="like-button">
-            <img src="./assets/images/like-active.svg">
+          <button data-post-id="${post.id}" class="like-button">
+            <img src="${likeButtonImg}">
           </button>
           <p class="post-likes-text">
-            Нравится: <strong>${post.likes[0].name || 'Никому'}
-              ${post.likes.length>1? `и ещё ${post.likes.length-1}` : ''}</strong>
+            Нравится: <strong>${post.likes.length}</strong>
           </p>
         </div>
         <p class="post-text">
@@ -44,12 +45,22 @@ export function renderPostsPageComponent({ appEl }) {
           ${post.description}
         </p>
         <p class="post-date">
-          ${timeAgo}
+          ${postDate}
         </p>
       </li>
     ` 
   }).join('');
-  
+
+  const appHtml = `
+    <div class="page-container">
+      <div class="header-container"></div>
+      <ul class="posts">
+        ${postsHtml}
+      </ul>
+    </div>`;
+
+  appEl.innerHTML = appHtml;
+
   /*const appHtml = `
               <div class="page-container">
                 <div class="header-container"></div>
@@ -131,9 +142,7 @@ export function renderPostsPageComponent({ appEl }) {
                     </p>
                   </li>
                 </ul>
-              </div>`;*/
-
-  appEl.innerHTML = appHtml;
+              </div>`;*/  
 
   renderHeaderComponent({
     element: document.querySelector(".header-container"),
