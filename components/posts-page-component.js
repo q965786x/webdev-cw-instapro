@@ -1,12 +1,12 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from "../index.js";
-import { formatDistanceToNow } from "https://esm.sh/date-fns";
-import { ru } from 'https://esm.sh/date-fns/locale';
+//import { formatDistanceToNow } from "https://esm.sh/date-fns";
+//import { ru } from 'https://esm.sh/date-fns/locale';
 
 export function renderPostsPageComponent({ appEl }) {
   // @TODO: реализовать рендер постов из api
-  console.log("Актуальный список постов:", posts);
+  //console.log("Актуальный список постов:", posts);
 
   /**
    * @TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
@@ -19,9 +19,9 @@ export function renderPostsPageComponent({ appEl }) {
       ? './assets/images/like-active.svg' 
       : './assets/images/like-not-active.svg';
 
-    const postDate = formatDistanceToNow(new Date(post.createdAt), 
+    /*const postDate = formatDistanceToNow(new Date(post.createdAt), 
       {locale: ru}
-    )
+    )*/
 
     return `
       <li class="post" data-post-id="${post.id}">
@@ -45,7 +45,7 @@ export function renderPostsPageComponent({ appEl }) {
           ${post.description}
         </p>
         <p class="post-date">
-          ${postDate}
+          
         </p>
       </li>
     ` 
@@ -144,6 +144,7 @@ export function renderPostsPageComponent({ appEl }) {
                 </ul>
               </div>`;*/  
 
+  // Рендерим заголовок страницы
   renderHeaderComponent({
     element: document.querySelector(".header-container"),
   });
@@ -155,4 +156,26 @@ export function renderPostsPageComponent({ appEl }) {
       });
     });
   }
+
+  // Добавляем обработчики событий для кликов по пользователям
+  initEventListeners();
+}
+
+function initEventListeners() {
+  // Обработчики для лайков
+  document.querySelectorAll('.like-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const postId = button.dataset.postId;
+      console.log('Like clicked for post:', postId);
+      // Здесь будет логика для обработки лайков
+    });
+  });
+
+  // Обработчики для кликов по пользователям
+  document.querySelectorAll('.post-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const userId = header.dataset.userId;
+      goToPage(USER_POSTS_PAGE, { userId });
+    });
+  });
 }

@@ -15,6 +15,8 @@ import {
   removeUserFromLocalStorage,
   saveUserToLocalStorage,
 } from "./helpers.js";
+import { renderUserPostsPageComponent } from "./components/user-posts-page-component.js";
+import { getUserPosts } from "./api.js";
 
 export let user = getUserFromLocalStorage();
 export let page = null;
@@ -68,20 +70,33 @@ export const goToPage = (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // @@TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
+      //console.log("Открываю страницу пользователя: ", data.userId);
+      page = LOADING_PAGE;
+      renderApp();
+
+      return getUserPosts({ 
+        token: getToken(), 
+        userId: data.userId 
+      })
+        .then((userPosts) => {
+          page = USER_POSTS_PAGE;
+          posts = userPosts;
+          renderApp();
+        })
+        .catch((error) => {
+          console.error("Ошибка при загрузке постов пользователя:", error);
+          goToPage(POSTS_PAGE);
+        });
     }
 
-    page = newPage;
-    renderApp();
+  page = newPage;
+  renderApp();
 
-    return;
+  return;
   }
 
   throw new Error("страницы не существует");
-};
+}
 
 const renderApp = () => {
   const appEl = document.getElementById("app");
@@ -112,28 +127,29 @@ const renderApp = () => {
       onAddPostClick({ description, imageUrl }) {
         // @TODO: реализовать добавление поста в API
         // Используем API для добавления поста
-      addPost({ 
-        token: getToken(), 
-        description, 
-        imageUrl 
-      })
-        .then(() => {
-          // После успешного добавления обновляем посты
-          return getPosts({ token: getToken() });
+        addPost({ 
+          token: getToken(), 
+          description, 
+          imageUrl 
         })
-        .then((newPosts) => {
-          posts = newPosts;
-          goToPage(POSTS_PAGE);
-        })
-        .catch((error) => {
-          console.error("Ошибка при добавлении поста:", error);
-          alert("Не удалось добавить пост");
-        });
-      }
-    }),
-  }
+          .then(() => {
+            // После успешного добавления обновляем посты
+            return getPosts({ token: getToken() });
+          })
+          .then((newPosts) => {
+            posts = newPosts;
+            goToPage(POSTS_PAGE);
+          })
+          .catch((error) => {
+            console.error("Ошибка при добавлении поста:", error);
+            alert("Не удалось добавить пост");
+          });
+      },
+    });
+  } 
   
-    if (page === POSTS_PAGE) {
+  
+  if (page === POSTS_PAGE) {
     return renderPostsPageComponent({
       appEl,
     });
@@ -141,8 +157,10 @@ const renderApp = () => {
 
   if (page === USER_POSTS_PAGE) {
     // @TODO: реализовать страницу с фотографиями отдельного пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
-    return;
+    return renderUserPostsPageComponent({
+      appEl,
+      userId: data.userId, // передаем ID пользователя
+    });
   }
 };
 

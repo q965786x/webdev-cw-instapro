@@ -1,0 +1,112 @@
+import { renderHeaderComponent } from "./header-component.js";
+import { posts, goToPage } from "../index.js";
+import { POSTS_PAGE } from "../routes.js";
+//import { formatDistanceToNow } from "https://esm.sh/date-fns";
+//import { ru } from 'https://esm.sh/date-fns/locale';
+
+export function renderUserPostsPageComponent({ appEl, userId }) {
+    const user = posts.length > 0 ? posts[0].user : null;
+
+    const appHtml = `
+        <div class='page-container'>
+            <div class='header-container'></div>
+            <div class='posts-header'>
+                <div class='posts-header__user-info'>
+                    ${user ? `
+                        <img src="${user.imageUrl}" class="posts-header__user-image" alt='фото поста'>
+                        <p class='posts-header__user-name'>${user.name}<>/p>
+                        `
+                        : `<p class='posts-header__user-name'>Пользователь</p>`
+                    }
+                </div>
+                <button class='button' id='back-button'>Назад</button>
+            </div>
+            <div class='posts-container'>
+                ${
+                posts.length === 0 
+                    ? '<p class="no-posts">У пользователя пока нет постов</p>'
+                    : `
+                    <ul class="posts">
+                    ${generatePostsHtml()}
+                    </ul>
+                    `
+                }
+            </div>
+        </div>      
+    `;
+
+    appEl.innerHTML = appHtml;
+
+    // Рендерим заголовок страницы
+    renderHeaderComponent({
+        element: document.querySelector(".header-container"),
+    });
+
+    // Обработчик кнопки "Назад"
+    document.getElementById("back-button").addEventListener("click", () => {
+        goToPage(POSTS_PAGE);
+    });
+
+    // Обработчики для лайков
+    initEventListeners();
+}
+
+function generatePostsHtml() {
+    return posts.map(post => {
+        const isLiked = post.isLiked;
+        const likeButtonImg = isLiked 
+            ? './assets/images/like-active.svg' 
+            : './assets/images/like-not-active.svg';
+
+    /*const postDate = formatDistanceToNow(new Date(post.createdAt), 
+        {locale: ru}
+    )*/
+
+    return `
+      <li class="post" data-post-id="${post.id}">
+        <div class="post-header" data-user-id=${post.user.id}>
+            <img src="${post.user.imageUrl}" class="post-header__user-image alt="фото профиля пользователя"
+            <p class="post-header__user-name">${post.user.name}</p>
+        </div>
+        <div class="post-image-container">
+          <img class="post-image" src="${post.imageUrl}" alt="фото поста">
+        </div>
+        <div class="post-likes">
+          <button data-post-id="${post.id}" class="like-button">
+            <img src="${likeButtonImg}">
+          </button>
+          <p class="post-likes-text">
+            Нравится: <strong>${post.likes.length}</strong>
+          </p>
+        </div>
+        <p class="post-text">
+          <span class="user-name">${post.user.name}</span>
+          ${post.description}
+        </p>
+        <p class="post-date">
+          
+        </p>
+      </li>
+    ` 
+  }).join('');
+}
+
+function initEventListeners() {
+    // Обработчики для лайков
+    document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const postId = button.dataset.postId;
+            console.log('Like clicked for post:', postId);
+            // Здесь будет логика для обработки лайков
+        });
+    });
+
+    // Обработчики для кликов по пользователям (если хотите оставить возможность перехода)
+    document.querySelectorAll('.post-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const userId = header.dataset.userId;
+            // Можно оставить или убрать, в зависимости от требований
+            console.log('User clicked:', userId);
+        });
+    });
+}
