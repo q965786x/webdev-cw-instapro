@@ -111,13 +111,29 @@ const renderApp = () => {
       appEl,
       onAddPostClick({ description, imageUrl }) {
         // @TODO: реализовать добавление поста в API
-        console.log("Добавляю пост...", { description, imageUrl });
-        goToPage(POSTS_PAGE);
-      },
-    });
+        // Используем API для добавления поста
+      addPost({ 
+        token: getToken(), 
+        description, 
+        imageUrl 
+      })
+        .then(() => {
+          // После успешного добавления обновляем посты
+          return getPosts({ token: getToken() });
+        })
+        .then((newPosts) => {
+          posts = newPosts;
+          goToPage(POSTS_PAGE);
+        })
+        .catch((error) => {
+          console.error("Ошибка при добавлении поста:", error);
+          alert("Не удалось добавить пост");
+        });
+      }
+    }),
   }
-
-  if (page === POSTS_PAGE) {
+  
+    if (page === POSTS_PAGE) {
     return renderPostsPageComponent({
       appEl,
     });
