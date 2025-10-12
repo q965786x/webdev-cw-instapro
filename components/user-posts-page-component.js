@@ -3,6 +3,8 @@ import { posts, goToPage } from "../index.js";
 import { POSTS_PAGE } from "../routes.js";
 //import { formatDistanceToNow } from "https://esm.sh/date-fns";
 //import { ru } from 'https://esm.sh/date-fns/locale';
+import { formatDistanceToNow } from "https://cdn.skypack.dev/date-fns"
+import { ru } from "https://cdn.skypack.dev/date-fns/locale"
 
 export function renderUserPostsPageComponent({ appEl, userId }) {
     //Получаем пользователя
@@ -58,9 +60,9 @@ function generatePostsHtml(posts) {
             ? './assets/images/like-active.svg' 
             : './assets/images/like-not-active.svg';
 
-    /*const postDate = formatDistanceToNow(new Date(post.createdAt), 
+    const postDate = formatDistanceToNow(new Date(post.createdAt), 
         {locale: ru}
-    )*/
+    )
 
     return `
       <li class="post" data-post-id="${post.id}">
@@ -84,7 +86,7 @@ function generatePostsHtml(posts) {
           ${post.description}
         </p>
         <p class="post-date">
-          
+         ${postDate} 
         </p>
       </li>
     ` 

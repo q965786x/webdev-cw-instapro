@@ -1,9 +1,12 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage, user } from "../index.js";
+import { posts, goToPage, user, getToken } from "../index.js";
 import { dislikePost, likePost } from "../api.js";
+import { renderApp } from "../index.js"
 //import { formatDistanceToNow } from "https://esm.sh/date-fns";
 //import { ru } from 'https://esm.sh/date-fns/locale';
+import { formatDistanceToNow } from "https://cdn.skypack.dev/date-fns"
+import { ru } from "https://cdn.skypack.dev/date-fns/locale"
 
 export function renderPostsPageComponent({ appEl }) {
   // @TODO: реализовать рендер постов из api
@@ -20,9 +23,9 @@ export function renderPostsPageComponent({ appEl }) {
       ? './assets/images/like-active.svg' 
       : './assets/images/like-not-active.svg';
 
-    /*const postDate = formatDistanceToNow(new Date(post.createdAt), 
+    const postDate = formatDistanceToNow(new Date(post.createdAt), 
       {locale: ru}
-    )*/
+    )
 
     return `
       <li class="post" data-post-id="${post.id}">
@@ -46,7 +49,7 @@ export function renderPostsPageComponent({ appEl }) {
           ${post.description}
         </p>
         <p class="post-date">
-          
+         ${postDate} 
         </p>
       </li>
     ` 
