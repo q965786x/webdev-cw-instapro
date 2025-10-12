@@ -1,4 +1,4 @@
-import { getPosts } from "./api.js";
+import { getPosts, getUserPosts, addPost } from "./api.js";
 import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
 import { renderAuthPageComponent } from "./components/auth-page-component.js";
 import {
@@ -16,7 +16,6 @@ import {
   saveUserToLocalStorage,
 } from "./helpers.js";
 import { renderUserPostsPageComponent } from "./components/user-posts-page-component.js";
-import { getUserPosts } from "./api.js";
 
 export let user = getUserFromLocalStorage();
 export let page = null;
@@ -159,7 +158,7 @@ const renderApp = () => {
     // @TODO: реализовать страницу с фотографиями отдельного пользвателя
     return renderUserPostsPageComponent({
       appEl,
-      userId: data.userId, // передаем ID пользователя
+      userId: data?.userId, // передаем ID пользователя    
     });
   }
 };

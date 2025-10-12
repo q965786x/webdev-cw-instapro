@@ -1,6 +1,7 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage } from "../index.js";
+import { posts, goToPage, user } from "../index.js";
+import { dislikePost, likePost } from "../api.js";
 //import { formatDistanceToNow } from "https://esm.sh/date-fns";
 //import { ru } from 'https://esm.sh/date-fns/locale';
 
@@ -165,9 +166,38 @@ function initEventListeners() {
   // Обработчики для лайков
   document.querySelectorAll('.like-button').forEach(button => {
     button.addEventListener('click', () => {
-      const postId = button.dataset.postId;
-      console.log('Like clicked for post:', postId);
+      const postId = button.dataset.postId;      
+      //console.log('Like clicked for post:', postId);
       // Здесь будет логика для обработки лайков
+      const post = posts.find(p => p.id === postId)
+
+      if (!post) return;
+
+      if (post.isLiked) {
+        //Дизлайк
+        dislikePost({ token: getToken(), postId })
+          .then(() => {
+            //Обновляем состояние поста
+            post.isLiked = false;
+            post.likes = post.likes.filter(like => like.id !== user.id);
+            renderApp();
+          })
+          .catch(error => {
+            console.error("Ошибка при дизлайке:", error);            
+          });
+      } else {
+        //Лайк
+        likePost({ token: getToken(), postId })
+          .then(() => {
+            //Обновляем состояние поста
+            post.isLiked = true;
+            post.likes.push(user);
+            renderApp();
+          })
+          .catch(error => {
+            console.error("Ошибка при лайке:", error);            
+          });
+      }
     });
   });
 

@@ -5,29 +5,27 @@ import { POSTS_PAGE } from "../routes.js";
 //import { ru } from 'https://esm.sh/date-fns/locale';
 
 export function renderUserPostsPageComponent({ appEl, userId }) {
-    const user = posts.length > 0 ? posts[0].user : null;
+    //Получаем пользователя
+    const userPosts = posts.filter(post => post.user.id === userId);
+    const user = userPosts.length > 0 ? userPosts[0].user : { name: "Пользователь", imageUrl: ""};
 
     const appHtml = `
         <div class='page-container'>
             <div class='header-container'></div>
             <div class='posts-header'>
-                <div class='posts-header__user-info'>
-                    ${user ? `
-                        <img src="${user.imageUrl}" class="posts-header__user-image" alt='фото поста'>
-                        <p class='posts-header__user-name'>${user.name}<>/p>
-                        `
-                        : `<p class='posts-header__user-name'>Пользователь</p>`
-                    }
+                <div class='posts-header__user-info'>                    
+                    <img src="${user.imageUrl}" class="posts-header__user-image" alt='фото поста'>
+                    <p class='posts-header__user-name'>${user.name}<>/p>                    
                 </div>
                 <button class='button' id='back-button'>Назад</button>
             </div>
             <div class='posts-container'>
                 ${
-                posts.length === 0 
+                userPosts.length === 0 
                     ? '<p class="no-posts">У пользователя пока нет постов</p>'
                     : `
                     <ul class="posts">
-                    ${generatePostsHtml()}
+                    ${generatePostsHtml(userPosts)}
                     </ul>
                     `
                 }
@@ -51,7 +49,9 @@ export function renderUserPostsPageComponent({ appEl, userId }) {
     initEventListeners();
 }
 
-function generatePostsHtml() {
+//Передаём posts как параметр
+
+function generatePostsHtml(posts) {
     return posts.map(post => {
         const isLiked = post.isLiked;
         const likeButtonImg = isLiked 
@@ -65,7 +65,7 @@ function generatePostsHtml() {
     return `
       <li class="post" data-post-id="${post.id}">
         <div class="post-header" data-user-id=${post.user.id}>
-            <img src="${post.user.imageUrl}" class="post-header__user-image alt="фото профиля пользователя"
+            <img src="${post.user.imageUrl}" class="post-header__user-image alt="фото профиля пользователя">
             <p class="post-header__user-name">${post.user.name}</p>
         </div>
         <div class="post-image-container">

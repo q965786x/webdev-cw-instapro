@@ -64,8 +64,8 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
       }
 
       onAddPostClick({
-        description: "Описание картинки",
-        imageUrl: "https://image.png",
+        description: description, //Описание картинки
+        imageUrl: imageUrl, //адрес Url
       });
     });
   };
