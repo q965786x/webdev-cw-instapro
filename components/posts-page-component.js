@@ -5,8 +5,10 @@ import { dislikePost, likePost } from "../api.js";
 import { renderApp } from "../index.js"
 //import { formatDistanceToNow } from "https://esm.sh/date-fns";
 //import { ru } from 'https://esm.sh/date-fns/locale';
-import { formatDistanceToNow } from "https://cdn.skypack.dev/date-fns"
-import { ru } from "https://cdn.skypack.dev/date-fns/locale"
+//import { formatDistanceToNow } from "https://cdn.skypack.dev/date-fns"
+//import { ru } from "https://cdn.skypack.dev/date-fns/locale"
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 
 export function renderPostsPageComponent({ appEl }) {
   // @TODO: реализовать рендер постов из api
@@ -49,7 +51,7 @@ export function renderPostsPageComponent({ appEl }) {
           ${post.description}
         </p>
         <p class="post-date">
-         ${postDate} 
+         ${postDate}
         </p>
       </li>
     ` 

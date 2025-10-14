@@ -3,8 +3,10 @@ import { posts, goToPage } from "../index.js";
 import { POSTS_PAGE } from "../routes.js";
 //import { formatDistanceToNow } from "https://esm.sh/date-fns";
 //import { ru } from 'https://esm.sh/date-fns/locale';
-import { formatDistanceToNow } from "https://cdn.skypack.dev/date-fns"
-import { ru } from "https://cdn.skypack.dev/date-fns/locale"
+//import { formatDistanceToNow } from "https://cdn.skypack.dev/date-fns"
+//import { ru } from "https://cdn.skypack.dev/date-fns/locale"
+import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 
 export function renderUserPostsPageComponent({ appEl, userId }) {
     //Получаем пользователя
@@ -86,7 +88,7 @@ function generatePostsHtml(posts) {
           ${post.description}
         </p>
         <p class="post-date">
-         ${postDate} 
+         ${postDate}
         </p>
       </li>
     ` 
