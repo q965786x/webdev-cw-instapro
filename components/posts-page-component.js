@@ -1,35 +1,36 @@
-import { USER_POSTS_PAGE } from "../routes.js";
-import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage, user, getToken } from "../index.js";
-import { dislikePost, likePost } from "../api.js";
-import { renderApp } from "../index.js"
+import { USER_POSTS_PAGE } from '../routes.js'
+import { renderHeaderComponent } from './header-component.js'
+import { posts, goToPage, user, getToken } from '../index.js'
+import { dislikePost, likePost } from '../api.js'
+import { renderApp } from '../index.js'
 //import { formatDistanceToNow } from "https://esm.sh/date-fns";
 //import { ru } from 'https://esm.sh/date-fns/locale';
 //import { formatDistanceToNow } from "https://cdn.skypack.dev/date-fns"
 //import { ru } from "https://cdn.skypack.dev/date-fns/locale"
-import { formatDistanceToNow } from "date-fns";
-import { ru } from "date-fns/locale";
+import { formatDistanceToNow } from 'date-fns'
+import { ru } from 'date-fns/locale'
 
 export function renderPostsPageComponent({ appEl }) {
-  // @TODO: реализовать рендер постов из api
-  //console.log("Актуальный список постов:", posts);
+    // @TODO: реализовать рендер постов из api
+    //console.log("Актуальный список постов:", posts);
 
-  /**
-   * @TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
-   * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
-   */
+    /**
+     * @TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
+     * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
+     */
 
-  const postsHtml = posts.map(post => {
-    const isLiked = post.isLiked;
-    const likeButtonImg = isLiked 
-      ? './assets/images/like-active.svg' 
-      : './assets/images/like-not-active.svg';
+    const postsHtml = posts
+        .map((post) => {
+            const isLiked = post.isLiked
+            const likeButtonImg = isLiked
+                ? './assets/images/like-active.svg'
+                : './assets/images/like-not-active.svg'
 
-    const postDate = formatDistanceToNow(new Date(post.createdAt), 
-      {locale: ru}
-    )
+            const postDate = formatDistanceToNow(new Date(post.createdAt), {
+                locale: ru,
+            })
 
-    return `
+            return `
       <li class="post" data-post-id="${post.id}">
         <div class="post-header" data-user-id=${post.user.id}>
             <img src="${post.user.imageUrl}" class="post-header__user-image alt="фото профиля пользователя"
@@ -54,20 +55,21 @@ export function renderPostsPageComponent({ appEl }) {
          ${postDate}
         </p>
       </li>
-    ` 
-  }).join('');
+    `
+        })
+        .join('')
 
-  const appHtml = `
+    const appHtml = `
     <div class="page-container">
       <div class="header-container"></div>
       <ul class="posts">
         ${postsHtml}
       </ul>
-    </div>`;
+    </div>`
 
-  appEl.innerHTML = appHtml;
+    appEl.innerHTML = appHtml
 
-  /*const appHtml = `
+    /*const appHtml = `
               <div class="page-container">
                 <div class="header-container"></div>
                 <ul class="posts">
@@ -148,69 +150,71 @@ export function renderPostsPageComponent({ appEl }) {
                     </p>
                   </li>
                 </ul>
-              </div>`;*/  
+              </div>`;*/
 
-  // Рендерим заголовок страницы
-  renderHeaderComponent({
-    element: document.querySelector(".header-container"),
-  });
+    // Рендерим заголовок страницы
+    renderHeaderComponent({
+        element: document.querySelector('.header-container'),
+    })
 
-  for (let userEl of document.querySelectorAll(".post-header")) {
-    userEl.addEventListener("click", () => {
-      goToPage(USER_POSTS_PAGE, {
-        userId: userEl.dataset.userId,
-      });
-    });
-  }
+    for (let userEl of document.querySelectorAll('.post-header')) {
+        userEl.addEventListener('click', () => {
+            goToPage(USER_POSTS_PAGE, {
+                userId: userEl.dataset.userId,
+            })
+        })
+    }
 
-  // Добавляем обработчики событий для кликов по пользователям
-  initEventListeners();
+    // Добавляем обработчики событий для кликов по пользователям
+    initEventListeners()
 }
 
 function initEventListeners() {
-  // Обработчики для лайков
-  document.querySelectorAll('.like-button').forEach(button => {
-    button.addEventListener('click', () => {
-      const postId = button.dataset.postId;      
-      //console.log('Like clicked for post:', postId);
-      // Здесь будет логика для обработки лайков
-      const post = posts.find(p => p.id === postId)
+    // Обработчики для лайков
+    document.querySelectorAll('.like-button').forEach((button) => {
+        button.addEventListener('click', () => {
+            const postId = button.dataset.postId
+            //console.log('Like clicked for post:', postId);
+            // Здесь будет логика для обработки лайков
+            const post = posts.find((p) => p.id === postId)
 
-      if (!post) return;
+            if (!post) return
 
-      if (post.isLiked) {
-        //Дизлайк
-        dislikePost({ token: getToken(), postId })
-          .then(() => {
-            //Обновляем состояние поста
-            post.isLiked = false;
-            post.likes = post.likes.filter(like => like.id !== user.id);
-            renderApp();
-          })
-          .catch(error => {
-            console.error("Ошибка при дизлайке:", error);            
-          });
-      } else {
-        //Лайк
-        likePost({ token: getToken(), postId })
-          .then(() => {
-            //Обновляем состояние поста
-            post.isLiked = true;
-            post.likes.push(user);
-            renderApp();
-          })
-          .catch(error => {
-            console.error("Ошибка при лайке:", error);            
-          });
-      }
-    });
-  });
+            if (post.isLiked) {
+                //Дизлайк
+                dislikePost({ token: getToken(), postId })
+                    .then(() => {
+                        //Обновляем состояние поста
+                        post.isLiked = false
+                        post.likes = post.likes.filter(
+                            (like) => like.id !== user.id,
+                        )
+                        renderApp()
+                    })
+                    .catch((error) => {
+                        console.error('Ошибка при дизлайке:', error)
+                    })
+            } else {
+                //Лайк
+                likePost({ token: getToken(), postId })
+                    .then(() => {
+                        //Обновляем состояние поста
+                        post.isLiked = true
+                        post.likes.push(user)
+                        renderApp()
+                    })
+                    .catch((error) => {
+                        console.error('Ошибка при лайке:', error)
+                    })
+            }
+        })
+    })
 
-  // Обработчики для кликов по пользователям
-  document.querySelectorAll('.post-header').forEach(header => {
-    header.addEventListener('click', () => {
-      const userId = header.dataset.userId;
-      goToPage(USER_POSTS_PAGE, { userId });
-    });
-  });
+    // Обработчики для кликов по пользователям
+    document.querySelectorAll('.post-header').forEach((header) => {
+        header.addEventListener('click', () => {
+            const userId = header.dataset.userId
+            goToPage(USER_POSTS_PAGE, { userId })
+        })
+    })
 }
