@@ -105,17 +105,47 @@ function initEventListeners() {
     document.querySelectorAll('.like-button').forEach((button) => {
         button.addEventListener('click', () => {
             const postId = button.dataset.postId
-            console.log('Like clicked for post:', postId)
+            //console.log('Like clicked for post:', postId);
             // Здесь будет логика для обработки лайков
+            const post = posts.find((p) => p.id === postId)
+
+            if (!post) return
+
+            if (post.isLiked) {
+                //Дизлайк
+                dislikePost({ token: getToken(), postId })
+                    .then(() => {
+                        //Обновляем состояние поста
+                        post.isLiked = false
+                        post.likes = post.likes.filter(
+                            (like) => like.id !== user.id,
+                        )
+                        renderApp()
+                    })
+                    .catch((error) => {
+                        console.error('Ошибка при дизлайке:', error)
+                    })
+            } else {
+                //Лайк
+                likePost({ token: getToken(), postId })
+                    .then(() => {
+                        //Обновляем состояние поста
+                        post.isLiked = true
+                        post.likes.push(user)
+                        renderApp()
+                    })
+                    .catch((error) => {
+                        console.error('Ошибка при лайке:', error)
+                    })
+            }
         })
     })
 
-    // Обработчики для кликов по пользователям (если хотите оставить возможность перехода)
+    // Обработчики для кликов по пользователям
     document.querySelectorAll('.post-header').forEach((header) => {
         header.addEventListener('click', () => {
             const userId = header.dataset.userId
-            // Можно оставить или убрать, в зависимости от требований
-            console.log('User clicked:', userId)
+            goToPage(USER_POSTS_PAGE, { userId })
         })
     })
 }
